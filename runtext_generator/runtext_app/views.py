@@ -2,9 +2,17 @@ from django.http import HttpResponse
 import cv2
 import numpy as np
 import os
+from .models import RequestLog  # Импортируем созданную модель
 
 def generate_running_text_video(request):
     runtext = request.GET.get('runtext', '')  # Получаем текст из параметра runtext, если он передан, иначе пустая строка
+
+    # Сохранение запроса в базе данных
+    request_log = RequestLog.objects.create(
+        method=request.method,
+        path=request.path,
+        body=request.body.decode('utf-8') if request.body else None
+    )
 
     # Настройки видео
     width = 100
