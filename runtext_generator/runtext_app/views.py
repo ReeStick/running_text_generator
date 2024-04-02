@@ -10,10 +10,13 @@ def generate_running_text_video(request):
     runtext = request.GET.get('runtext', '')  # Получаем текст из параметра runtext, если он передан, иначе пустая строка
 
     # Сохранение запроса в базе данных
-    request_log = RequestLog.objects.create(
+    get_arguments = dict(request.GET)
+    request_body = request.body.decode('utf-8') if request.body else None
+    RequestLog.create_log(
         method=request.method,
         path=request.path,
-        body=request.body.decode('utf-8') if request.body else None
+        get_arguments=json.dumps(get_arguments),
+        body=request_body
     )
 
     # Настройки видео
@@ -70,19 +73,3 @@ def generate_running_text_video(request):
     response = HttpResponse(video_content, content_type='video/mp4')
     response['Content-Disposition'] = 'attachment; filename="running_text_video.mp4"'
     return response
-
-@require_http_methods(["GET"])  # Ограничиваем этот представление только для GET запросов
-def log_request(request):
-    # Получаем аргументы GET запроса
-    get_arguments = dict(request.GET)
-
-    # Сохраняем лог запроса
-    log_entry = RequestLog.objects.create(
-        method=request.method,
-        path=request.path,
-        get_arguments=json.dumps(get_arguments),  # Преобразуем аргументы GET в строку JSON для сохранения в базе данных
-        # Другие поля, которые вы хотите сохранить, например, IP адрес, заголовки и т.д.
-    )
-
-    # Отправляем ответ клиенту
-    return HttpResponse("Request logged successfully")
