@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 COPY . /code/
 
 # Выполняем миграции и собираем статические файлы
-RUN python ./runtext_generator/manage.py migrate
+RUN python ./runtext_generator/manage.py makemigrations && python ./runtext_generator/manage.py migrate
 RUN python ./runtext_generator/manage.py collectstatic --noinput
 
 # Открываем порт 7000
