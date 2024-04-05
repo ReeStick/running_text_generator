@@ -29,4 +29,4 @@ RUN python ./runtext_generator/manage.py collectstatic --noinput
 EXPOSE 7000
 
 # Запускаем сервер Django при старте контейнера
-CMD ["python", "./runtext_generator/manage.py", "runserver", "0.0.0.0:7000"]
+CMD ["python", "./runtext_generator/manage.py", "runserver", "127.0.0.1:7000"]
