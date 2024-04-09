@@ -20,18 +20,21 @@ def generate_running_text_video(request):
     )
 
     # Настройки видео
-    width = 100
+    width = 100  # изменяем ширину и высоту для лучшего отображения
     height = 100
     fps = 24
     seconds = 3
 
     # Шрифт и его параметры
     font = cv2.FONT_HERSHEY_COMPLEX
-    font_scale = 1
-    font_thickness = 2
+    font_scale = 3
+    font_thickness = 3
 
     # Рассчитываем ширину текста и положение начальной точки
-    text_width, _ = cv2.getTextSize(runtext, font, font_scale, font_thickness)[0]
+    text_size, _ = cv2.getTextSize(runtext, font, font_scale, font_thickness)
+    text_width, text_height = text_size
+    text_length = len(runtext)
+    text_speed = (width + text_width) / (fps * seconds)  # Скорость прокрутки текста, чтобы он прошел от края до края за указанное время
     text_x = width
 
     # Создание кадров для видео
@@ -40,17 +43,17 @@ def generate_running_text_video(request):
         # Создаем пустой кадр
         frame = np.zeros((height, width, 3), dtype=np.uint8)
         frame.fill(255)  # Заливаем его белым цветом
-        
+
         # Определяем текущую позицию текста
-        text_x -= int(text_width / (fps * seconds / 1.25)) # Видео немного ускорено для корректного отображения текста
-        
+        text_x -= int(text_speed)
+
         # Если текст вышел за пределы кадра, возвращаем его в начало
         if text_x < -text_width:
             text_x = width
-        
+
         # Рисуем текст на кадре
-        cv2.putText(frame, runtext, (text_x, int(height/2)), font, font_scale, (0, 0, 0), font_thickness)
-        
+        cv2.putText(frame, runtext, (text_x, int(height / 2) + int(text_height / 2)), font, font_scale, (0, 0, 0), font_thickness)
+
         # Добавляем кадр в список
         frames.append(frame)
 
